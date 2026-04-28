@@ -21,22 +21,35 @@ df=pd.DataFrame(data)
 print(df)
 
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import MultinomialNB
+#from sklearn.naive_bayes import MultinomialNB
 
-vectorizer= TfidfVectorizer()
+vectorizer= TfidfVectorizer( 
+    ngram_range= (1,2),         #parole singole e coppie 
+    stop_words=None             #quali parole ignorare durante la creazione di un modello di testo
+)
 X= vectorizer.fit_transform(df["testo"])
 y=df["label"]
 
-model=MultinomialNB()
+from sklearn.linear_model import LogisticRegression
+model= LogisticRegression()
 model.fit(X,y)
 
 testi = [
-    "guadagna soldi subito gratis",
-    "ciao ci vediamo dopo"
+    "gratis ciao riunione progetto",
+    "ciao ci vediamo dopo",
+    "ciao GRATIS gratis",
+    "gratis gratis progetto",
+    "offerta limitata clicca"
 ]
 
 X_test = vectorizer.transform(testi)
-
 predizioni = model.predict(X_test)
 
-print(predizioni)
+for t,p in zip(testi, predizioni):
+    print(f"{t}->{p}")
+
+messaggio= input("scrivi un messaggio: ")
+C_test= vectorizer.transform([messaggio])
+print(model.predict(C_test))
+
+#print(vectorizer.get_feature_names_out())
